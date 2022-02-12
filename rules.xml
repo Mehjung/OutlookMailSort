@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mailin>
+    <ruleset name = "Verkehrsdispo">
+        <mailinPath path = "Region Mitte Verkehrsdispo Trier"/>
+        <mailinPath path = "Region.Mitte.Verkehrsdispo.Trier@deutschebahn.com"/>
+        <mailinPath path = "Region.Mitte.Verkehrsdispo.Trier"/>
+        <rule tag = "move">
+            <criteria absender = "Einsatzleitsystem.DBRegio@deutschebahn.com"/>
+            <frist tage = "2"/>
+            <targetPath path = "03_Verkehrsdisposition\17_Einsatzleitsystem"/>
+        </rule>
+        <rule tag ="delete">
+            <criteria absender = "no-reply@cfl.lu"/>
+            <frist tage = "2"/>
+        </rule>
+        <rule tag ="delete">
+            <criteria absender = "noreply@staffbase.com"/>
+            <frist tage = "2"/>
+        </rule>
+        <rule tag ="delete">
+            <criteria absender = "KAR.BZ-Fahrplanmitteilung@deutschebahn.com"/>
+            <criteria name = "BZ Zug"/>
+            <frist tage = "2"/>
+        </rule>
+        <rule tag ="delete">
+            <criteria absender = "FFM.BZ-BdR1@deutschebahn.com"/>
+            <criteria name = "Zug"/>
+            <frist tage = "2"/>
+        </rule>
+      </ruleset>
+</mailin>
