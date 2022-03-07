@@ -1,17 +1,12 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from xml.dom.minidom import *
 from pathlib import Path
 import os
 
 class IXmlReader(ABC):
 
-    @abstractmethod
-    def getMailInPathsFromXML(self):
-        pass
-
-    @abstractmethod
-    def getRulesByRuleSetName(self, ruleSetName):
-        pass
+    pass
 
 class xmlReader (IXmlReader):
     
@@ -21,36 +16,69 @@ class xmlReader (IXmlReader):
         self.__fileDirectory = Path(os.path.dirname(self.__absolutepath))
         self.__xmlStringPath = str(self.__fileDirectory / self.__xmlFile)
         self.__dom_object = parse(self.__xmlStringPath)
-        self.__root = self.__dom_object.documentElement
+        self.root = self.__dom_object.documentElement
 
-    def getMailInPathsFromXML(self):
-        return [(x.getAttribute("name"),[y.getAttribute("path")for y in x.getElementsByTagName("mailinPath")])for x in self.__root.getElementsByTagName("ruleset")]
+class xmlReaderMethods(object):
 
-    def getRulesByRuleSetName(self, ruleSetName):
-        root = self.__root.getElementsByTagName("ruleset")
-        for x in root:
-            if x.getAttribute("name") == ruleSetName:
-                return [self.__getRuleAsList(y) for y in x.getElementsByTagName("rule")]
+    def __init__(self, xmlMiniDomObj) -> None:
+        self.xmlMiniDom = xmlMiniDomObj
 
-    def __getRuleAsList(self, domObject):
-        return [domObject.getAttribute("tag")] + [self.__retValueByType(x) for x in domObject.childNodes if x.nodeType == 1 ]
-
-    def __retValueByType(self,value):
-        checkList = ["name","absender","tage","path"]
-        for x in checkList:
-            if value.hasAttribute(x):
-                if value.tagName == "criteria":
-                    return (value.tagName,x, value.getAttribute(x))
-                return (value.tagName,value.getAttribute(x))
-        raise NotImplemented
-
-"""xmlFile = 'rules.xml'
-xml = xmlReader(xmlFile)
-
-print(xml.getRulesByRuleSetName("Verkehrsdispo"))
-print(xml.getMailInPathsFromXML())"""
-
-
-
-
+    def getDictFromAttributeValuesByTag(self, tag):
+        return {self.getNameFromNode(x):self.getValueFromNode(x) for x in self.xmlMiniDom.getElementsByTagName(tag)}
+        
+    def getListFromTagValues(self, tag):
+        return [self.getValueFromNode(x) for x in self.xmlMiniDom.getElementsByTagName(tag)]
     
+    def getListFromTag(self, tag):
+        return self.xmlMiniDom.getElementsByTagName(tag)
+
+    def getValueFromTag(self):
+        return list(self.xmlMiniDom.attributes.values())[0].value
+
+    def getRuleSets(self):
+        return ruleSets(self.getListFromTag("ruleset"))    
+
+    def getValueFromNode(self, node):
+        return list(node.attributes.values())[0].value
+
+    def getNameFromNode(self, node):
+        return list(node.attributes.values())[0].name
+    
+@dataclass
+class ruleSets(list):
+
+    def __init__(self, sets) -> None:
+        self.extend([ruleSet(x) for x in sets])
+
+@dataclass
+class ruleSet(object):
+
+    def __init__(self, set) -> None:
+        self.set = xmlReaderMethods(set)
+        self.name = self.set.getValueFromTag()
+        self.aliase = self.set.getListFromTagValues("mailinPath")
+        self.rules = [rule(x) for x in self.set.getListFromTag("rule")]
+
+@dataclass
+class rule(object):
+
+    def __init__(self, obj) -> None:
+        self.obj = xmlReaderMethods(obj)
+        self.tag = self.obj.getValueFromTag()
+        self.frist = self.obj.getListFromTagValues("frist")[0]
+        self.criteria = self.obj.getDictFromAttributeValuesByTag("criteria")
+        self.targetPath = next(iter(self.obj.getListFromTagValues("targetPath")),None)
+        
+
+
+
+xmlFile = 'rules.xml'
+xml = xmlReader(xmlFile)
+xmlFuncTest = xmlReaderMethods(xml.root)
+temp = xmlFuncTest.getRuleSets()
+print(temp)
+print("Hello")
+
+
+
+
