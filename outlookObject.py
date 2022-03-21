@@ -39,7 +39,7 @@ def filter(filterDict):
         "Subject"               :   "(urn:schemas:httpmail:subject Like '%VALUE%')",
         "ReceivedTime"          :   "(urn:schemas:httpmail:datereceived < 'VALUE')",
     }
-
+    
     return "@SQL=" + " AND ".join([ sw[fName].replace("VALUE", fValue) if fName != "ReceivedTime" else \
                                     sw[fName].replace("VALUE", (datetime.today() - timedelta(days=int(fValue))).strftime('%Y-%m-%d %H:%M %p')) \
                                     for fName, fValue in filterDict.items()])
@@ -56,7 +56,7 @@ critValues = (rules[0].rules[0].criteria)
 #critValues.pop("Subject")
 #critValues.pop("ReceivedTime")
 print(filter(critValues))
-ol.readMailItemsFromInboxByFilter(filter, critValues)
+ol.readMailItemsFromInboxByFilter(filter,critValues)
 print(ol)
 
 

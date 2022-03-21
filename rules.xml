@@ -1,31 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mailin>
-    <ruleset name = "Verkehrsdispo">
-        <mailinPath path = "Region Mitte Verkehrsdispo Trier"/>
-        <mailinPath path = "Region.Mitte.Verkehrsdispo.Trier@deutschebahn.com"/>
-        <mailinPath path = "Region.Mitte.Verkehrsdispo.Trier"/>
-        <rule tag = "move">
+    <ruleset DisplayName = "Verkehrsdispo">
+        <mailinPath Recipient = "Region.Mitte.Verkehrsdispo.Trier@deutschebahn.com"/>
+        <rule operation = "move">
             <criteria SenderEmailAddress = "Einsatzleitsystem.DBRegio@deutschebahn.com"/>
-            <frist days = "2"/>
-            <targetPath path = "03_Verkehrsdisposition\17_Einsatzleitsystem"/>
+            <criteria ReceivedTime = "2"/>
+            <targetPath path = "03_Verkehrsdisposition|17_Einsatzleitsystem"/>
         </rule>
-        <rule tag ="delete">
+        <rule operation ="delete">
             <criteria SenderEmailAddress = "no-reply@cfl.lu"/>
-            <frist days = "2"/>
+            <criteria ReceivedTime = "2"/>
         </rule>
-        <rule tag ="delete">
+        <rule operation ="delete">
             <criteria SenderEmailAddress = "noreply@staffbase.com"/>
-            <frist days = "2"/>
+            <criteria ReceivedTime = "2"/>
         </rule>
-        <rule tag ="delete">
+        <rule operation ="delete">
             <criteria SenderEmailAddress = "KAR.BZ-Fahrplanmitteilung@deutschebahn.com"/>
             <criteria Subject = "BZ Zug"/>
-            <frist days = "2"/>
+            <criteria ReceivedTime = "2"/>
         </rule>
-        <rule tag ="delete">
+        <rule operation ="delete">
             <criteria SenderEmailAddress = "FFM.BZ-BdR1@deutschebahn.com"/>
             <criteria Subject = "Zug"/>
-            <frist days = "2"/>
+            <criteria ReceivedTime = "2"/>
         </rule>
       </ruleset>
 </mailin>

@@ -55,8 +55,8 @@ class ruleSet(object):
 
     def __init__(self, set) -> None:
         self.set = xmlReaderMethods(set)
-        self.name = self.set.getValueFromTag()
-        self.aliase = self.set.getListFromTagValues("mailinPath")
+        self.DisplayName = self.set.getValueFromTag()
+        self.Recipient = self.set.getListFromTagValues("mailinPath")[0]
         self.rules = [rule(x) for x in self.set.getListFromTag("rule")]
 
 @dataclass
@@ -64,8 +64,7 @@ class rule(object):
 
     def __init__(self, obj) -> None:
         self.obj = xmlReaderMethods(obj)
-        self.tag = self.obj.getValueFromTag()
-        self.frist = self.obj.getListFromTagValues("frist")[0]
+        self.operation = self.obj.getValueFromTag()
         self.criteria = self.obj.getDictFromAttributeValuesByTag("criteria")
         self.targetPath = next(iter(self.obj.getListFromTagValues("targetPath")),None)
         
@@ -75,9 +74,7 @@ class rule(object):
 xmlFile = 'rules.xml'
 xml = xmlReader(xmlFile)
 xmlFuncTest = xmlReaderMethods(xml.root)
-temp = xmlFuncTest.getRuleSets()
-print(temp)
-print("Hello")
+rueles = xmlFuncTest.getRuleSets()
 
 
 
