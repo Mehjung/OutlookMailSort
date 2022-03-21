@@ -1,83 +1,63 @@
 from abc import ABC, abstractmethod
-from cmath import e
-import string
-import os
+from msilib.schema import Error
 import win32com.client
-
+from xmlRulesReader import *
+from datetime import *
 class outlookApi(object):
     """
-    Outlook Api Wrapper:
+    Outlook Api Stuff:
     """
+    olFolderInbox = 6
+    olMail = 43
 
-    def __init__(self) -> None:
-        self.__mapi = self.outlookObject().GetNamespace("MAPI")
+    def __init__(self,recipient) -> None:
+        self.__outlook = win32com.client.Dispatch("Outlook.Application")
+        self.__mapi = self.__outlook.GetNamespace("MAPI")
+        self.__recipient = None
+        self.__mailItems = None
+        self.setRecipient(recipient)
+            
+    def setRecipient(self, recipient):
+        self.__recipient = self.__mapi.CreateRecipient(recipient)
+        self.__recipient.Resolve
 
-    def printSubjectFromMailin(self, *mailname):
-        ''' Gibt den EMail Subject Titel der Emails aus dem Posteingang des Arguments auf der Console aus.'''
-        box = self.getInboxItemsFromMailIn(*mailname)
-        if box is not None:
-            for x in box:
-                print (x.Subject)
-        else:
-            print ("No MailBox to print out!")
+    def readMailItemsFromInbox(self):
+        self.__mailItems = self.__mapi.GetSharedDefaultFolder(self.__recipient, self.olFolderInbox).Items
+        return (x for x in self.__mailItems if x.Class == self.olMail)
 
-    def getInboxItemsFromMailIn(self, *mailInName):
-        ''' Gibt die Items aus dem Posteingang des Arguments zurück.'''
-        for box in mailInName:
-            if self.__mapi.FolderExists(box):
-                return self.__mapi.Folders(box).Folders("Posteingang").items
-
-    def find(self, id, mailInBox):
-        ''' gibt ein Item Object basieren auf der Angabe der ID zurueck.'''
-        return self.__mapi.GetItemFromID(id)
+    def readMailItemsFromInboxByFilter(self, filter, dict):
+        filterString = filter(dict)
+        self.__mailItems = self.__mapi.GetSharedDefaultFolder(self.__recipient, self.olFolderInbox).Items.Restrict(filterString)
+        return (x for x in self.__mailItems if x.Class == self.olMail)
+   
+    def __repr__(self) -> str:
+        return "\n".join(map(lambda x : x.Subject, self.__mailItems)) + str(len (self.__mailItems))
     
-    class outlookObject(object):
-        
-        def __init__(self) -> None:
-            self.__outlook = win32com.client.Dispatch("Outlook.Application")
-            self.__aliase = {"Posteingang":"Inbox", "Inbox":"Posteingang"}
-        
-        def Folders(self , name):
-            if self.FolderExists(name):
-                self.__outlook = self.__outlook.Folders(name)
-            elif self.__tryAliasFolder(name):
-                self.__outlook = self.__outlook.Folders(self.__aliase[name])
-            else:
-                print ("Folder " + name + " not found!")
-            return self
-       
-        def __tryAliasFolder(self, name):
-            return name in self.__aliase and self.FolderExists(self.__aliase[name])
-                
+def filter(filterDict):
+    sw ={
+        "SenderEmailAddress"    :   "((urn:schemas:httpmail:fromemail Like '%VALUE%') OR (http://schemas.microsoft.com/mapi/proptag/0x5D02001F Like '%VALUE%'))",
+        "Subject"               :   "(urn:schemas:httpmail:subject Like '%VALUE%')",
+        "ReceivedTime"          :   "(urn:schemas:httpmail:datereceived < 'VALUE')",
+    }
 
-        def GetNamespace(self, mapi):
-            self.__outlook = self.__outlook.GetNamespace(mapi)
-            return self
+    return "@SQL=" + " AND ".join([ sw[fName].replace("VALUE", fValue) if fName != "ReceivedTime" else \
+                                    sw[fName].replace("VALUE", (datetime.today() - timedelta(days=int(fValue))).strftime('%Y-%m-%d %H:%M %p')) \
+                                    for fName, fValue in filterDict.items()])
 
-        def FolderExists(self, mailInName: string) -> bool:
-            try:
-                self.__outlook.Folders(mailInName)
-                return True
-            except BaseException as e:
-                return not(e.args[0]==-2147352567)
-        
-        def __getattr__(self, name):
-            try:
-                return getattr(self.__outlook, name)
-            except AttributeError:
-                raise AttributeError(
-                    "'%s' object has no attribute '%s'" % (type(self).__name__, name))
-
-
-
-
-ol = outlookApi()
-#ol.p()
-ol.printSubjectFromMailin("Jan.Ehrmantraut@deutschebahn.com")
+ol = outlookApi("Region.Mitte.Verkehrsdispo.Trier@deutschebahn.com")
+#ol.out()
 #print(ol.find("00000000874D1B6A6D17A24AB78977D94C9943410700F97EE50A14DD0D40B89EC2D8805390DC00000000010C0000F97EE50A14DD0D40B89EC2D8805390DC00031CAEC6E20000","Jan.Ehrmantraut@deutschebahn.com"))
 
-
-
+xmlFile = 'rules.xml'
+xml = xmlReader(xmlFile)
+xmlFuncTest = xmlReaderMethods(xml.root)
+rules = xmlFuncTest.getRuleSets()
+critValues = (rules[0].rules[0].criteria)
+#critValues.pop("Subject")
+#critValues.pop("ReceivedTime")
+print(filter(critValues))
+ol.readMailItemsFromInboxByFilter(filter, critValues)
+print(ol)
 
 
 
