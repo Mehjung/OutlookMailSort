@@ -25,5 +25,10 @@
             <criteria Subject = "Zug"/>
             <criteria ReceivedTime = "2"/>
         </rule>
+        <rule operation ="read">
+            <criteria SenderEmailAddress = "FFM.BZ-BdR1@deutschebahn.com"/>
+            <criteria Subject = "Zug"/>
+            <criteria ReceivedTime = "2"/>
+        </rule>
       </ruleset>
 </mailin>

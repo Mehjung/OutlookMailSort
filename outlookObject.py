@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from msilib.schema import Error
+from ast import YieldFrom
 import win32com.client
 from xmlRulesReader import *
 from datetime import *
@@ -10,29 +10,42 @@ class outlookApi(object):
     olFolderInbox = 6
     olMail = 43
 
-    def __init__(self,recipient) -> None:
+    def __init__(self) -> None:
         self.__outlook = win32com.client.Dispatch("Outlook.Application")
         self.__mapi = self.__outlook.GetNamespace("MAPI")
         self.__recipient = None
         self.__mailItems = None
-        self.setRecipient(recipient)
             
     def setRecipient(self, recipient):
         self.__recipient = self.__mapi.CreateRecipient(recipient)
         self.__recipient.Resolve
 
+    def getFolderByString(self, FolderString):
+        if isinstance(FolderString, str):
+            strList = FolderString.split('|')
+            rootFolder = self.__mapi.GetSharedDefaultFolder(self.__recipient, self.olFolderInbox).Parent
+            for folder in strList:
+                rootFolder = rootFolder.Folders(folder)
+            return rootFolder
+
     def readMailItemsFromInbox(self):
         self.__mailItems = self.__mapi.GetSharedDefaultFolder(self.__recipient, self.olFolderInbox).Items
-        return (x for x in self.__mailItems if x.Class == self.olMail)
-
+        yield from self.__mailItems 
+ 
     def readMailItemsFromInboxByFilter(self, filter, dict):
         filterString = filter(dict)
-        self.__mailItems = self.__mapi.GetSharedDefaultFolder(self.__recipient, self.olFolderInbox).Items.Restrict(filterString)
-        return (x for x in self.__mailItems if x.Class == self.olMail)
-   
+        yield from  self.__mapi.GetSharedDefaultFolder(self.__recipient, self.olFolderInbox).Items.Restrict(filterString)
+
+    def find(self, id):
+        return self.__mapi.GetItemFromID(id)
+
     def __repr__(self) -> str:
-        return "\n".join(map(lambda x : x.Subject, self.__mailItems)) + str(len (self.__mailItems))
-    
+        if self.__mailItems is None or (len(self.__mailItems) == 0):
+            return "No Mails loaded. Load with: \n \t 'readMailItemsFromInbox()' or \n \t 'readMailItemsFromInboxByFilter(filter, dict)' " 
+        else:
+            return "\n".join(map(lambda x : x.Subject, self.__mailItems)) + str(len (self.__mailItems))
+        
+        
 def filter(filterDict):
     sw ={
         "SenderEmailAddress"    :   "((urn:schemas:httpmail:fromemail Like '%VALUE%') OR (http://schemas.microsoft.com/mapi/proptag/0x5D02001F Like '%VALUE%'))",
@@ -44,20 +57,9 @@ def filter(filterDict):
                                     sw[fName].replace("VALUE", (datetime.today() - timedelta(days=int(fValue))).strftime('%Y-%m-%d %H:%M %p')) \
                                     for fName, fValue in filterDict.items()])
 
-ol = outlookApi("Region.Mitte.Verkehrsdispo.Trier@deutschebahn.com")
-#ol.out()
-#print(ol.find("00000000874D1B6A6D17A24AB78977D94C9943410700F97EE50A14DD0D40B89EC2D8805390DC00000000010C0000F97EE50A14DD0D40B89EC2D8805390DC00031CAEC6E20000","Jan.Ehrmantraut@deutschebahn.com"))
 
-xmlFile = 'rules.xml'
-xml = xmlReader(xmlFile)
-xmlFuncTest = xmlReaderMethods(xml.root)
-rules = xmlFuncTest.getRuleSets()
-critValues = (rules[0].rules[0].criteria)
-#critValues.pop("Subject")
-#critValues.pop("ReceivedTime")
-print(filter(critValues))
-ol.readMailItemsFromInboxByFilter(filter,critValues)
-print(ol)
+#id = '00000000791E8F48704B174BACEB6C34D285EAA507008E1BA98461214C4A92B4611F6831E8D500000000010C00008E1BA98461214C4A92B4611F6831E8D500028D5A841A0000'
 
-
-
+#ol = outlookApi()
+#tl = ol.find(id)
+#print("Wait")
