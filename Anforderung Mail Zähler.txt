@@ -1,0 +1,3 @@
+- Sortierte Personalemails -> updaten einen Zähler für Tf und KiN Krankmeldungen. Nach Ende der Zählung soll
+ eine Excel Tabelle im Sharepoint geöffnet werden und der Wert aus der Zählung in eine fortlaufende Zelle 
+ eingetragen werden.

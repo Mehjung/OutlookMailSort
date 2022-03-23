@@ -69,10 +69,7 @@ class rule(object):
         self.targetPath = next(iter(self.obj.getListFromTagValues("targetPath")),None)
         
 
-xmlFile = 'rules.xml'
-xml = xmlReader(xmlFile)
-xmlFuncTest = xmlReaderMethods(xml.root)
-rueles = xmlFuncTest.getRuleSets()
+
 
 
 

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mailin>
+    <ruleset DisplayName = "Personal">
+        <mailinPath Recipient = "Leitstelle_Trier_Dispo_Personal@deutschebahn.com"/>
+        <rule operation = "move">
+            <criteria Subject = "Krankmeldung Tf"/>
+            <criteria ReceivedTime = "1"/>
+            <targetPath path = "02_Krankmeldung Tf"/>
+        </rule>
+        <rule operation = "move">
+            <criteria Subject = "Krankmeldung KiN"/>
+            <criteria ReceivedTime = "1"/>
+            <targetPath path = "02a_Krankmeldung KiN"/>
+        </rule>
+        <rule operation = "move">
+            <criteria Subject = "Krankmeldung Disponent"/>
+            <criteria ReceivedTime = "1"/>
+            <targetPath path = "02b_Krankmeldung Dispo"/>
+        </rule>
+        <rule operation = "move">
+            <criteria Subject = "Betriebslage"/>
+            <criteria ReceivedTime = "1"/>
+            <targetPath path = "06_Betriebslage"/>
+        </rule>
+        <rule operation = "move">
+            <criteria Subject = "Gesundmeldung"/>
+            <criteria ReceivedTime = "1"/>
+            <targetPath path = "04_Gesundmeldungen"/>
+        </rule>
+    </ruleset>    
+</mailin>

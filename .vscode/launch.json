@@ -2,13 +2,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "Python: Aktuelle Datei",
             "type": "python",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "cwd": "${fileDirname}",
-            "env": {"PYTHONPATH": "${workspaceFolder}${pathSeparator}${env:PYTHONPATH}"}
+            "justMyCode": true
         }
+    
     ]
 }

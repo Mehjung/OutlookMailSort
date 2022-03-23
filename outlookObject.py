@@ -58,8 +58,9 @@ def filter(filterDict):
                                     for fName, fValue in filterDict.items()])
 
 
-#id = '00000000791E8F48704B174BACEB6C34D285EAA507008E1BA98461214C4A92B4611F6831E8D500000000010C00008E1BA98461214C4A92B4611F6831E8D500028D5A841A0000'
-
 #ol = outlookApi()
-#tl = ol.find(id)
-#print("Wait")
+#ol.setRecipient("Region.Mitte.Verkehrsdispo.Trier@deutschebahn.com")
+#filtDict = {"SenderEmailAddress":"no-reply@cfl.lu","ReceivedTime":"2"}
+
+#tmp = list(ol.readMailItemsFromInboxByFilter(filter,filtDict))
+#print (filter(filtDict))

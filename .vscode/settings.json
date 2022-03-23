@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "d:\\Users\\BKU\\JanEhrmantraut\\OneDrive - Deutsche Bahn\\Programmierung\\VS Code\\Sprachen\\Python 3.10.1\\python.exe"
+    
+    "python.defaultInterpreterPath": "C:/Python39/venv/Scripts/python.exe"
 }

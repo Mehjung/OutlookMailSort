@@ -25,7 +25,8 @@ def matchActions(createDASLString, olAPI, system, ruleSets):
 
     def syncRulesToMailItems(rules):
         for rule in rules:
-            mailItems = getMailsByFilter(rule.criteria)
+            print("Working on rule :    " + rule.operation )
+            mailItems = list(getMailsByFilter(rule.criteria))
             cntItems = len(list(getMailsByFilter(rule.criteria)))
             for ml in mailItems:
                 matchRule(ml,rule , cntItems)
@@ -70,11 +71,6 @@ class logger():
             
             file_handler = logging.FileHandler(lg + '.log', mode = 'w', encoding = 'utf-8')
             file_handler.setLevel(logging.INFO)
-            
-            #formatter = logging.Formatter('[%(asctime)s] %(levelname)8s --- %(message)s ' + \
-            #                              '(%(filename)s:%(lineno)s)',datefmt='%Y-%m-%d %H:%M:%S')
-            
-            #file_handler.setFormatter(formatter)
             lgObj.addHandler(file_handler)
     
     def logDel(self, olObj):
@@ -91,10 +87,13 @@ class logger():
         _logger = self.logDict['read']
         _logger.info("Mails read:    " + str(cnt)+ "\n\n")
         
-
     def commonLogging(self, olObj, _logger):
         if olObj.SenderEmailType == "EX":
-            sender = olObj.Sender.GetExchangeUser().PrimarySmtpAddress
+            try:
+                sender = olObj.Sender.GetExchangeUser().PrimarySmtpAddress
+            except:
+                sender = "Could not resolved -> not an Mail Item."
+                pass    
         else:
             sender = olObj.SenderEmailAddress
         _logger.info(
@@ -104,8 +103,9 @@ class logger():
                     "Mail Type: " + olObj.SenderEmailType 
                     )
   
+  
 
-xmlFile = 'rules.xml'
+xmlFile = 'rulesVerkehrsdispo.xml'
 xml = xmlReader(xmlFile)
 xmlFuncTest = xmlReaderMethods(xml.root)
 rules = xmlFuncTest.getRuleSets()

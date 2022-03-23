@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mailin>
+    <ruleset DisplayName = "1780">
+        <mailinPath Recipient = "Leitstelle_Trier_Dispo_1780@deutschebahn.com"/>
+        <rule operation = "move">
+            <criteria Subject = "Anzeige Graffiti"/>
+            <criteria ReceivedTime = "3"/>
+            <targetPath path = "Schadensmeldung Graffiti|2022"/>
+        </rule>
+        <rule operation = "move">
+            <criteria Subject = "Auftrag Graffiti"/>
+            <criteria ReceivedTime = "3"/>
+            <targetPath path = "Graffitibeauftragung|2022"/>
+        </rule>
+        <rule operation = "move">
+            <criteria Subject = "Betriebslage"/>
+            <criteria ReceivedTime = "1"/>
+            <targetPath path = "Betriebslage"/>
+        </rule>
+    </ruleset>      
+</mailin>
